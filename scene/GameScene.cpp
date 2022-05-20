@@ -6,7 +6,7 @@ using namespace DirectX;
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() { delete model_; }
 
 void GameScene::Initialize() {
 
@@ -14,11 +14,37 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
+	//画面読み込み
+	texureHandle_ = TextureManager ::Load("ps.png");
+	//3Dモデル生成
+	model_ = Model ::Create();
+	// XYZのスケーリング
+	worldTransform_.scale_ = {5.0f, 5.0f, 5.0f};
+	worldTransform_.rotation_ = {XM_PI/4.0f,XM_PI/4.0f,4.0f};
+	// 	
+	worldTransform_.translation_ = {10.0f, 10.0f, 10.0f};
+	//ワールドトランス初期化
+	worldTransform_.Initialize();
+	//ビュープロジェクション初期化
+	viewProjection_.Initialize();
+	
+
+	}
+
+void GameScene::Update() 
+{ char str[100];
+	sprintf_s(str, "translation %f" ,123.33f);
+	debugText_->Print(str, 100, 10, 1);
+
+	sprintf_s(str, "rotation %f", 123.33f);
+	debugText_->Print(str, 100, 30, 1);
+
+	sprintf_s(str, "scale %f", 123.33f);
+	debugText_->Print(str, 100, 50, 1);
+
 }
 
-void GameScene::Update() {}
-
-void GameScene::Draw() {
+    void GameScene::Draw() {
 
 	// コマンドリストの取得
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
@@ -44,7 +70,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-
+	model_->Draw(worldTransform_, viewProjection_, texureHandle_);
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
